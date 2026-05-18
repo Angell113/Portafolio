@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miguel Angel — Portafolio</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    :root {
+      --bg:      #0a0c10;
+      --bg2:     #111318;
+      --bg3:     #161b25;
+      --border:  #1e2330;
+      --border2: #252d3e;
+      --accent:  #4f8ef7;
+      --accent2: #7c6ef0;
+      --green:   #3ecf8e;
+      --red:     #ef4444;
+      --amber:   #f5a623;
+      --text:    #e8edf5;
+      --text2:   #8892a4;
+      --text3:   #4a5568;
+      --nav-h:   58px;
+    }
+    body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+      height: var(--nav-h); background: rgba(10,12,16,0.97);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 2rem; justify-content: space-between;
+    }
+    nav { display: flex; gap: 0.15rem; }
+    nav button {
+      background: none; border: none; cursor: pointer;
+      color: var(--text2); font-size: 0.85rem; font-weight: 500;
+      padding: 0.4rem 0.9rem; border-radius: 6px;
+      transition: color 0.2s, background 0.2s; font-family: inherit;
+    }
+    nav button:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    nav button.active { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 0.5rem; }
+    .btn-edit {
+      background: none; border: 1px solid var(--border2); cursor: pointer;
+      color: var(--text3); font-size: 0.78rem; font-weight: 600;
+      padding: 0.3rem 0.8rem; border-radius: 6px;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn-edit:hover { color: var(--text2); border-color: var(--text3); }
+    .btn-edit.active { color: var(--amber); border-color: var(--amber); background: rgba(245,166,35,0.08); }
+    .btn-static { background: none; border: 1px solid var(--border2); cursor: pointer; color: var(--text3); font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.8rem; border-radius: 6px; transition: all 0.2s; font-family: inherit; }
+    .btn-static:hover { color: var(--green); border-color: rgba(62,207,142,0.5); background: rgba(62,207,142,0.06); }
+    .btn-static:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-progress { position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 300; height: 2px; background: var(--border); }
+    .nav-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+    /* EDIT TOOLBAR */
+    #edit-toolbar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 400;
+      background: rgba(10,12,16,0.98); border-top: 1px solid rgba(245,166,35,0.3);
+      padding: 0.75rem 2rem; display: none; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    #edit-toolbar.show { display: flex; }
+    .edit-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.3); border-radius: 99px; padding: 0.25rem 0.65rem; }
+    .edit-hint { font-size: 0.78rem; color: var(--text3); }
+    .edit-toolbar-right { display: flex; gap: 0.5rem; }
+    .tbtn { font-family: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.45rem 1.1rem; border-radius: 7px; cursor: pointer; border: none; transition: opacity 0.2s, transform 0.15s; }
+    .tbtn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .tbtn-save   { background: linear-gradient(135deg,#4f8ef7,#7c6ef0); color: #fff; }
+    .tbtn-export { background: rgba(62,207,142,0.15); color: #6ee7b7; border: 1px solid rgba(62,207,142,0.25); }
+    .tbtn-cancel { background: rgba(255,255,255,0.05); color: var(--text2); border: 1px solid var(--border2); }
+
+    /* SLIDES */
+    #slides { position: fixed; top: calc(var(--nav-h) + 2px); left: 0; right: 0; bottom: 0; overflow: hidden; }
+    .page {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding: 4rem 3rem 5rem;
+      transition: transform 0.42s cubic-bezier(0.4,0,0.2,1), opacity 0.42s cubic-bezier(0.4,0,0.2,1);
+      scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
+    }
+    .page::-webkit-scrollbar { width: 5px; }
+    .page::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+    .page.state-active  { transform: translateX(0);    opacity: 1;   pointer-events: auto; }
+    .page.state-right   { transform: translateX(100%); opacity: 0.3; pointer-events: none; }
+    .page.state-left    { transform: translateX(-100%);opacity: 0.3; pointer-events: none; }
+    .page-inner { max-width: 860px; margin: 0 auto; }
+    body.edit-mode .page { padding-bottom: 6rem; }
+
+    /* SHARED */
+    .section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px; color: var(--accent); margin-bottom: 0.65rem; }
+    .section-title { font-size: clamp(1.8rem,3.5vw,2.6rem); font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 2.5rem; }
+    .section-title span { background: linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* BUTTONS */
+    .btn { display: inline-block; text-decoration: none; font-size: 0.875rem; font-weight: 600; padding: 0.65rem 1.4rem; border-radius: 8px; transition: opacity 0.2s, transform 0.15s; cursor: pointer; border: none; font-family: inherit; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #fff; }
+    .btn-outline { border: 1px solid var(--border2); color: var(--text2); background: rgba(255,255,255,0.03); }
+
+    /* ABOUT skills */
+    .skills-block { display: flex; flex-direction: column; gap: 1.5rem; }
+    .skill-group-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); margin-bottom: 0.55rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.38rem; }
+    .tag { font-size: 0.71rem; font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 5px; background: rgba(255,255,255,0.04); color: var(--text2); border: 1px solid var(--border2); }
+    .tag-py       { background: rgba(79,142,247,0.08); color: #93c5fd; border-color: rgba(79,142,247,0.18); }
+    .tag-js       { background: rgba(245,166,35,0.08); color: #fcd34d; border-color: rgba(245,166,35,0.18); }
+    .tag-react    { background: rgba(56,189,248,0.08); color: #7dd3fc; border-color: rgba(56,189,248,0.18); }
+    .tag-node     { background: rgba(62,207,142,0.08); color: #6ee7b7; border-color: rgba(62,207,142,0.18); }
+    .tag-sql      { background: rgba(239,68,68,0.08);  color: #fca5a5; border-color: rgba(239,68,68,0.18); }
+    .tag-electron { background: rgba(147,51,234,0.08); color: #d8b4fe; border-color: rgba(147,51,234,0.18); }
+    .tag-excel    { background: rgba(62,207,142,0.1);  color: #a7f3d0; border-color: rgba(62,207,142,0.2); }
+
+    /* PROJECTS */
+    .projects-list { display: flex; flex-direction: column; gap: 0.7rem; }
+    .project-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 11px;
+      padding: 1.5rem 1.75rem; display: grid; grid-template-columns: 2.75rem 1fr auto;
+      gap: 1.1rem; align-items: start;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .project-card:not(.dragging):hover { border-color: var(--border2); background: var(--bg3); }
+    .project-num { font-size: 0.75rem; font-weight: 800; color: var(--accent); padding-top: 0.15rem; }
+    .project-body { display: flex; flex-direction: column; gap: 0.45rem; }
+    .project-header { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    .project-title { font-size: 0.975rem; font-weight: 700; }
+    .project-org { font-size: 0.74rem; color: var(--text3); }
+    .project-desc { font-size: 0.845rem; color: var(--text2); line-height: 1.65; max-width: 600px; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; }
+    .project-tags .tag { font-size: 0.67rem; }
+    .project-status { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.18rem 0.55rem; border-radius: 99px; white-space: nowrap; align-self: start; }
+    .ps-prod   { background: rgba(62,207,142,0.1);  color: #6ee7b7; border: 1px solid rgba(62,207,142,0.2); }
+    .ps-dev    { background: rgba(245,166,35,0.1);  color: #fcd34d; border: 1px solid rgba(245,166,35,0.2); }
+    .ps-mvp    { background: rgba(124,110,240,0.1); color: #c4b5fd; border: 1px solid rgba(124,110,240,0.2); }
+    .ps-red    { background: rgba(239,68,68,0.1);   color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+    .ps-blue   { background: rgba(56,189,248,0.1);  color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
+    .ps-amber  { background: rgba(251,191,36,0.1);  color: #fde68a; border: 1px solid rgba(251,191,36,0.2); }
+    /* status color picker */
+    .sp-trigger { display:inline-block; width:8px; height:8px; border-radius:50%; border:none; cursor:pointer; margin-right:5px; padding:0; background:currentColor; opacity:0.65; transition:opacity 0.15s,transform 0.15s; vertical-align:middle; position:relative; top:-1px; }
+    .sp-trigger:hover { opacity:1; transform:scale(1.45); }
+    #status-picker { position:fixed; background:var(--bg2); border:1px solid var(--border2); border-radius:9px; padding:0.3rem; display:flex; flex-direction:column; gap:0.12rem; box-shadow:0 8px 28px rgba(0,0,0,0.55); min-width:158px; z-index:9999; }
+    .sp-opt { display:flex; align-items:center; gap:0.5rem; padding:0.38rem 0.65rem; border-radius:6px; border:none; background:none; cursor:pointer; color:var(--text2); font-size:0.78rem; font-weight:600; font-family:inherit; transition:background 0.12s; text-align:left; width:100%; }
+    .sp-opt:hover { background:rgba(255,255,255,0.06); color:var(--text); }
+    .sp-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+    /* EXPERIENCE */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-entry { display: grid; grid-template-columns: 160px 1fr; gap: 2.5rem; padding: 2rem 0; border-bottom: 1px solid var(--border); position: relative; }
+    .timeline-entry:last-child { border-bottom: none; }
+    .tl-date { font-size: 0.77rem; font-weight: 600; color: var(--text3); text-align: right; padding-top: 0.2rem; line-height: 1.5; }
+    .tl-date .current { display: inline-block; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); background: rgba(62,207,142,0.1); border: 1px solid rgba(62,207,142,0.2); border-radius: 99px; padding: 0.14rem 0.5rem; margin-top: 0.3rem; }
+    .tl-body { display: flex; flex-direction: column; gap: 0.35rem; }
+    .tl-role { font-size: 0.975rem; font-weight: 700; }
+    .tl-company { font-size: 0.84rem; color: var(--accent); font-weight: 600; }
+    .tl-desc { font-size: 0.845rem; color: var(--text2); line-height: 1.7; margin-top: 0.2rem; }
+    .tl-achievements { list-style: none; margin-top: 0.55rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    .tl-achievements li { font-size: 0.82rem; color: var(--text2); display: flex; align-items: flex-start; gap: 0.55rem; }
+    .tl-achievements li::before { content: '—'; color: var(--text3); flex-shrink: 0; }
+
+    /* EDUCATION */
+    .edu-list { display: flex; flex-direction: column; }
+    .edu-entry { display: grid; grid-template-columns: 160px 1fr; gap: 2.5rem; padding: 2rem 0; border-bottom: 1px solid var(--border); position: relative; }
+    .edu-entry:last-child { border-bottom: none; }
+    .edu-date { font-size: 0.77rem; font-weight: 600; color: var(--text3); text-align: right; padding-top: 0.2rem; }
+    .edu-body { display: flex; flex-direction: column; gap: 0.3rem; }
+    .edu-degree { font-size: 0.975rem; font-weight: 700; }
+    .edu-institution { font-size: 0.84rem; color: var(--accent); font-weight: 600; }
+    .edu-desc { font-size: 0.845rem; color: var(--text2); line-height: 1.65; margin-top: 0.2rem; }
+
+    /* ══ EDIT MODE UI ══ */
+
+    /* editable fields */
+    body.edit-mode [data-ek] {
+      outline: 1px dashed rgba(79,142,247,0.35);
+      border-radius: 3px; cursor: text;
+      /* fix: gradient text becomes invisible when contenteditable */
+      -webkit-text-fill-color: currentColor !important;
+      background-image: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+    }
+    body.edit-mode [data-ek]:hover { outline: 1px solid rgba(79,142,247,0.65); background: rgba(79,142,247,0.04) !important; }
+    body.edit-mode [data-ek]:focus { outline: 2px solid var(--accent) !important; background: rgba(79,142,247,0.07) !important; }
+
+    /* skills textarea in edit mode */
+    .skills-textarea {
+      width: 100%; background: rgba(79,142,247,0.05);
+      border: 1px dashed rgba(79,142,247,0.35); border-radius: 6px;
+      padding: 0.5rem 0.65rem; color: var(--text2);
+      font-size: 0.78rem; font-family: inherit;
+      resize: vertical; min-height: 52px; line-height: 1.6;
+      outline: none; transition: border-color 0.15s;
+    }
+    .skills-textarea:focus { border-color: var(--accent); }
+
+    /* drag handle */
+    .drag-handle {
+      display: none; position: absolute;
+      left: -1.75rem; top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px; border-radius: 6px;
+      align-items: center; justify-content: center; flex-direction: column; gap: 2.5px;
+      cursor: grab; color: var(--text3);
+      background: var(--bg3); border: 1px solid var(--border2);
+      transition: background 0.15s, border-color 0.15s;
+      user-select: none; -webkit-user-select: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+    .drag-handle span { display: block; width: 12px; height: 1.5px; background: currentColor; border-radius: 99px; }
+    body.edit-mode .project-card,
+    body.edit-mode .timeline-entry,
+    body.edit-mode .edu-entry { margin-left: 2rem; }
+    body.edit-mode .drag-handle { display: flex; }
+    .drag-handle:hover { background: var(--bg2); border-color: var(--accent); color: var(--accent); }
+
+    /* drag states */
+    .project-card.dragging, .timeline-entry.dragging, .edu-entry.dragging { opacity: 0.3; }
+    .project-card.drag-over, .timeline-entry.drag-over, .edu-entry.drag-over { border-top: 2px solid var(--accent); }
+
+    /* delete button */
+    .delete-btn {
+      display: none; position: absolute;
+      top: 0.85rem; right: 0.85rem;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
+      color: #ef4444; font-size: 0.9rem; line-height: 1;
+      align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.15s;
+      font-family: inherit;
+    }
+    .delete-btn:hover { background: rgba(239,68,68,0.22); }
+    body.edit-mode .delete-btn { display: flex; }
+
+    /* add button */
+    .add-entry-btn {
+      display: none; width: 100%; margin-top: 0.75rem;
+      padding: 0.65rem; border-radius: 9px;
+      border: 1px dashed var(--border2); background: none;
+      color: var(--text3); font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; letter-spacing: 0.3px;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .add-entry-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.04); }
+    body.edit-mode .add-entry-btn { display: block; }
+
+    /* CONTACT CARD */
+    .contact-card {
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 1.25rem 1.5rem;
+      display: flex; flex-direction: column; gap: 0.85rem;
+    }
+    .contact-position {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--accent); margin-bottom: 0.1rem;
+    }
+    .contact-name { font-size: 0.95rem; font-weight: 800; letter-spacing: -0.3px; }
+    .contact-links { display: flex; flex-direction: column; gap: 0.3rem; }
+    .contact-link {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-size: 0.82rem; color: var(--text2); text-decoration: none;
+      padding: 0.35rem 0.55rem; border-radius: 7px;
+      border: 1px solid transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .contact-link:hover { background: rgba(79,142,247,0.07); border-color: rgba(79,142,247,0.2); color: var(--text); }
+    .contact-link .cl-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; flex-shrink: 0; font-weight: 700;
+    }
+    .cl-linkedin { background: rgba(10,102,194,0.15); color: #4da6ff; }
+    .cl-github   { background: rgba(255,255,255,0.07); color: var(--text2); }
+    .cl-email    { background: rgba(79,142,247,0.12); color: #93c5fd; }
+    .cl-phone    { background: rgba(62,207,142,0.12); color: #6ee7b7; }
+    .contact-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* about — one-screen layout */
+    #page-about {
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem 3rem; overflow: hidden;
+    }
+    #page-about .page-inner { width: 100%; }
+    .about-hero { margin-bottom: 1.5rem; }
+    .about-hero .hero-eyebrow { font-size: 0.7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+    .about-hero .hero-title { font-size: clamp(1.7rem,3.5vw,2.6rem); font-weight: 800; letter-spacing: -1px; line-height: 1.08; margin-bottom: 0.65rem; }
+    .about-hero .hero-title .name { background: linear-gradient(135deg, #e8edf5 30%, #8892a4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .about-hero .hero-subtitle { font-size: 0.875rem; color: var(--text2); line-height: 1.65; max-width: 540px; }
+    .about-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .about-skills-col { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    @media (max-width: 700px) {
+      header { padding: 0 1rem; }
+      .page { padding: 2.5rem 1.25rem 4rem; }
+      .about-body { grid-template-columns: 1fr; gap: 1.75rem; }
+      .project-card { grid-template-columns: 2.5rem 1fr; }
+      .project-status { display: none; }
+      .timeline-entry, .edu-entry { grid-template-columns: 1fr; gap: 0.25rem; }
+      .tl-date, .edu-date { text-align: left; }
+    }
+  </style>
+</head>
+<body class="">
+
+<header>
+  <nav>
+    <button onclick="goTo(0)" class="">About</button>
+    <button onclick="goTo(1)" class="active">Projects</button>
+    <button onclick="goTo(2)" class="">Experience</button>
+    <button onclick="goTo(3)" class="">Education</button>
+  </nav>
+  <div class="nav-right">
+    
+    
+  </div>
+</header>
+<div class="nav-progress"><div class="nav-progress-fill" id="progressFill" style="width: 33.3333%;"></div></div>
+
+
+
+<div id="slides">
+
+  <!-- ABOUT (landing page) -->
+  <div class="page state-active" id="page-about">
+    <div class="page-inner">
+
+      <!-- Hero intro -->
+      <div class="about-hero">
+        <div class="hero-eyebrow" data-ek="hero-eyebrow">Ingeniero en telecomunicaciones, conectividad y redes.</div>
+        <h1 class="hero-title">
+          <span class="name" data-ek="hero-name">Miguel Ángel Núñez&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span>
+        </h1>
+        <p class="hero-subtitle" data-ek="hero-subtitle">Titulado de la carrera Ingeniero en Telecomunicaciones, Conectividad y Redes, titulado en el instituto INACAP en la localidad de Talcahuano-Concepción. Actualmente trabajo en la industria minera como informático, brindando soporte a sistemas LIMS y realizando análisis de datos mineros. Desarrollé soluciones de software para automatizar tareas y generar dashboards automáticos, y aplico macros en Excel para optimizar procesos. Trabajo con integración de PI System (AVEVA) y hago uso destacado de herramientas de inteligencia artificial para asistencia y automatización (MCP, agentes y optimización de uso).</p>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border2);margin-bottom:1.5rem;">
+
+      <!-- Body: skills + contact -->
+      <div class="about-body">
+
+        <!-- Skills -->
+        <div class="about-skills-col">
+          <div class="section-label" style="margin-bottom:0.75rem;">Stack tecnologico</div>
+          <div class="tags" data-ek="skills-all"><span class="tag">ORACLE</span><span class="tag">AVEVA PI SYSTEM</span><span class="tag">PostgreSQL</span><span class="tag">LIMS</span><span class="tag">Claude-code</span><span class="tag">Open-code</span><span class="tag">VBA-Excel</span><span class="tag">VGL</span><span class="tag">Python</span><span class="tag">MCP</span><span class="tag">Node.js</span><span class="tag">SQLlite</span><span class="tag">EVENG</span><span class="tag">GNS3</span><span class="tag">LINUX</span></div>
+        </div>
+
+        <!-- Contact card -->
+        <div class="contact-card">
+          <div>
+            <div class="contact-position" data-ek="contact-position">Informatico LIMS — SGS Minerals S.A.</div>
+            <div class="contact-name" data-ek="contact-name">Miguel Angel Nuñez Silva</div>
+          </div>
+          <hr class="contact-divider">
+          <div class="contact-links">
+            <a class="contact-link" href="https://www.linkedin.com/in/miguel-%C3%A1ngel-nu%C3%B1ez-silva-7b1ba1253/" target="_blank" rel="noopener">
+              <div class="cl-icon cl-linkedin">in</div>
+              <span>LinkedIn</span>
+            </a>
+            <a class="contact-link" href="https://github.com/Angell113/" target="_blank" rel="noopener">
+              <div class="cl-icon cl-github">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+              </div>
+              <span>github.com/Angell113</span>
+            </a>
+            <a class="contact-link" href="mailto:minunezsilva@gmail.com">
+              <div class="cl-icon cl-email">@</div>
+              <span data-ek="contact-email">minunezsilva@gmail.com</span>
+            </a>
+            <a class="contact-link" href="tel:+56934029838">
+              <div class="cl-icon cl-phone">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"></path></svg>
+              </div>
+              <span data-ek="contact-phone">+56 9 3402 9838</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page state-right" id="page-projects">
+    <div class="page-inner">
+      <div class="section-label">01 — Projects</div>
+      <div class="section-title">Proyectos</div>
+      <div class="projects-list" id="projects-list">
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">01</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p1-title">GRF DRT — Sistema RESSO</span>
+              <span class="project-org" data-ek="p1-org">SGS MINERLAS S.A.</span>
+            </div>
+            <p class="project-desc" data-ek="p1-desc">Aplicacion web de red de área local (LAN), Gestor de documentación en tiempo real, centralizado en una sola aplicación, su uso es para tener todo ordenado para temas de audición de la información critica, esta aplicación esta orientada para que un profesional en prevención de riesgos la pueda usar, ahorrando tiempo.</p>
+            <div class="project-tags" data-ek="p1-tags"><span class="tag">React 18</span><span class="tag">Express 4</span><span class="tag">PostgreSQL 16</span><span class="tag">Prisma 5</span><span class="tag">Tailwind</span><span class="tag">JWT</span><span class="tag">Nodemailer</span></div>
+          </div>
+          <span class="project-status ps-prod" data-ek="p1-status">Produccion</span>
+        </div>
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">02</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p2-title">RADIM — Plataforma SX-EW</span>
+              <span class="project-org" data-ek="p2-org">SGS MINERALS S.A.</span>
+            </div>
+            <p class="project-desc" data-ek="p2-desc">Plataforma de analisis y reporte para operaciones SX-EW. Backend FastAPI servido al navegador local, con conexion a OSIsoft PI System via VPN para lectura de tags en tiempo real, historico 30 dias y datos de laboratorio PLS.</p>
+            <div class="project-tags" data-ek="p2-tags"><span class="tag">Python 3.12</span><span class="tag">FastAPI</span><span class="tag">SQLite</span><span class="tag">Chart.js</span><span class="tag">PIconnect</span><span class="tag">pywin32</span><span class="tag">JWT</span></div>
+          </div>
+          <span class="project-status ps-mvp" data-ek="p2-status">en desarollo (MVP)</span>
+        </div>
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">03</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p3-title">Sistema de ingreso de datos Lingada Catodos</span>
+              <span class="project-org" data-ek="p3-org">SGS Minerals SA</span>
+            </div>
+            <p class="project-desc" data-ek="p3-desc">Aplicación de escritorio, actualmente su uso es local (para db), su uso es para registrar las fallas o "no-conformidades" de la inspección de los catodos de manera física, con este reporte de datos, el sistema construye un dashboard en donde se pueden consultar por fechas, items, Banco-grupos, etc. ademas de que tiene integrado un sistema de correo automático y poder generar un informe en formato .pdf de manera automatizada.</p>
+            <div class="project-tags" data-ek="p3-tags"><span class="tag">Electron 41</span><span class="tag">JavaScript</span><span class="tag">Chart.js</span><span class="tag">jsPDF</span><span class="tag">Nodemailer</span></div>
+          </div>
+          <span class="project-status ps-prod" data-ek="p3-status">Produccion</span>
+        </div>
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">04</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p4-title">Ingreso de datos Catodos Quimicos&nbsp;</span>
+              <span class="project-org" data-ek="p4-org">SGS MINERALS S.A.</span>
+            </div>
+            <p class="project-desc" data-ek="p4-desc">Workbook Excel macro-habilitado (.xlsm) para registro de analisis quimicos de catodos. Calculo automatico de Pb y S por triplicado, clasificacion por grado de calidad y dashboard con graficos de tendencia por banco. Generado via script Python.</p>
+            <div class="project-tags" data-ek="p4-tags"><span class="tag">Excel VBA</span><span class="tag">Python</span><span class="tag">xlwings</span><span class="tag">win32com</span></div>
+          </div>
+          <span class="project-status ps-prod" data-ek="p4-status">Produccion</span>
+        </div>
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">05</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p5-title">Sistema de Inventario EPP</span>
+              <span class="project-org" data-ek="p5-org">SGS MINERALS S.A.</span>
+            </div>
+            <p class="project-desc" data-ek="p5-desc">PWA offline-first para gestion de inventario de Equipos de Proteccion Personal. Funciona sin internet (Service Worker + IndexedDB), compatible con tablet Android. Incluye conjuntos EPP, ordenes de compra y backup exportable en JSON.</p>
+            <div class="project-tags" data-ek="p5-tags"><span class="tag">React</span><span class="tag">Vite</span><span class="tag">IndexedDB</span><span class="tag">PWA</span><span class="tag">Service Worker</span></div>
+          </div>
+          <span class="project-status ps-amber" data-ek="p5-status">PROTOTIPO</span>
+        </div>
+
+        <div class="project-card">
+          
+          
+          <div class="project-num">06</div>
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-title" data-ek="p6-title">Gestor de documentación Laboratorio DRT</span>
+              <span class="project-org" data-ek="p6-org">SGS MINERALS S.A.</span>
+            </div>
+            <p class="project-desc" data-ek="p6-desc">Sistema de gestion para laboratorio quimico: personal, cursos, certificaciones y vencimientos con modulos configurables dinamicamente. Backup automatico diario a Google Drive y dashboard de vencimientos por turno y rol.</p>
+            <div class="project-tags" data-ek="p6-tags"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">SQLite</span><span class="tag">React 18</span><span class="tag">APScheduler</span><span class="tag">Google Drive API</span></div>
+          </div>
+          <span class="project-status ps-dev" data-ek="p6-status">En desarrollo</span>
+        </div>
+
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <div class="page state-right" id="page-experience">
+    <div class="page-inner">
+      <div class="section-label">02 — Experience</div>
+      <div class="section-title">Experiencia</div>
+      <div class="timeline" id="timeline-list">
+
+        <div class="timeline-entry">
+          
+          <div class="tl-date"><span data-ek="exp1-date">MARZO 2025 — Presente</span><div class="current">Actual</div></div>
+          <div class="tl-body">
+            <div class="tl-role" data-ek="exp1-role">Soporte Informatico LIMS</div>
+            <div class="tl-company" data-ek="exp1-company">SGS MINERALS S.A - Division Radomiro Tomic (DRT)</div>
+            <p class="tl-desc" data-ek="exp1-desc">Desarrollo y mantenimiento de sistemas internos de gestion de datos para la division. Trabajo actualmente dando soporte al gestor de muestras del laboratorio químico (LIMS), implementando integraciones con sistemas informáticos y equipos de medición, ademas de desarrollar software a medida de los requerimientos para la empresa. destaco los software que he desarrollado:</p>
+            <ul class="tl-achievements" data-ek="exp1-ach">
+              <li>Sistema de ingreso de datos Lingada Catodos: Sistema de ingreso de datos de las fallas que tienen los cátodos de la división, integrado con dashboard, generación de informes automatico, función de envio de correo automatico al ingresar datos.</li>
+              <li>Plataforma RADIM: monitoreo SX-EW en tiempo real conectado a OSIsoft PI System</li><li>Sistema de inventario: Control de los items que se entregan y se reciben en faena&nbsp;</li><li>Gestor de Riesgo Critico GRF - RESSO: Gestor de documentación en tiempo real</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="timeline-entry">
+          
+          <div class="tl-date"><span data-ek="exp2-date">MAYO 2023 — AGOSTO 2023</span></div>
+          <div class="tl-body">
+            <div class="tl-role" data-ek="exp2-role">Practica profesional - SOPORTE TI</div>
+            <div class="tl-company" data-ek="exp2-company">Centro educacional de alta tecnología (CEAT)</div>
+            <p class="tl-desc" data-ek="exp2-desc">Encargado de dar soporte a nivel usuario, ademas de integrar sistemas de seguridad.</p>
+            <ul class="tl-achievements" data-ek="exp2-ach">
+              <li>Integración de un FIREWALL open-source llamado "opensence", con esto pudimos balancear las cargas de la red de mejor manera</li>
+              <li>uso de equipos Cisco y Ubiquiti&nbsp;</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="page state-right" id="page-education">
+    <div class="page-inner">
+      <div class="section-label">03 — Education</div>
+      <div class="section-title">Educacion</div>
+      <div class="edu-list" id="edu-list">
+
+        <div class="edu-entry">
+          
+          <div class="edu-date" data-ek="edu1-date">2025</div>
+          <div class="edu-body">
+            <div class="edu-degree" data-ek="edu1-degree">LIMS Administration for SampleManager</div>
+            <div class="edu-institution" data-ek="edu1-inst">Thermofisher Scientific</div>
+            <p class="edu-desc" data-ek="edu1-desc">Curso completado en formato online, en donde nos formaron con los fundamentos básicos para el uso de LIMS.</p>
+          </div>
+        </div>
+
+        
+
+      
+    
+    <div class="edu-entry">
+      
+      
+      <div class="edu-date" data-ek="edt-1779075057728">2019 — 2023</div>
+      <div class="edu-body">
+        <div class="edu-degree" data-ek="edd-1779075057728">Ingeniero en Telecomunicaciones, Conectividad y Redes</div>
+        <div class="edu-institution" data-ek="edi-1779075057728">INACAP</div>
+        <p class="edu-desc" data-ek="edx-1779075057728">Formacion en desarrollo de soluciones en infraestructura de Redes, base de datos, y desarrollo de programas para automatizar tareas relacionada a las redes, manejo de entornos virtuales con sistema operativo Linux para construir las estructuras requeridas.</p>
+      </div>
+    </div></div>
+      
+    </div>
+  </div>
+
+</div>
+
+
+
+
+<div style="position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%); background: rgba(62, 207, 142, 0.15); color: rgb(110, 231, 183); border: 1px solid rgba(62, 207, 142, 0.3); padding: 0.55rem 1.25rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; z-index: 9999; pointer-events: none; transition: opacity 0.4s;">Guardado correctamente</div><script>
+const PAGES=['page-about','page-projects','page-experience','page-education'];
+const NAV_BTNS=document.querySelectorAll('nav button');
+let current=0,animating=false;
+function updateProgress(i){document.getElementById('progressFill').style.width=(i/(PAGES.length-1))*100+'%';}
+function updateNav(i){NAV_BTNS.forEach((b,j)=>b.classList.toggle('active',j===i));}
+function goTo(idx){
+  if(idx===current||animating)return;animating=true;
+  const dir=idx>current?1:-1;
+  const o=document.getElementById(PAGES[current]),n=document.getElementById(PAGES[idx]);
+  n.classList.remove('state-left','state-right','state-active');
+  n.classList.add(dir>0?'state-right':'state-left');
+  n.scrollTop=0;n.getBoundingClientRect();
+  o.classList.remove('state-active');o.classList.add(dir>0?'state-left':'state-right');
+  n.classList.remove('state-left','state-right');n.classList.add('state-active');
+  current=idx;updateNav(idx);updateProgress(idx);
+  setTimeout(()=>{animating=false;},450);
+}
+updateNav(0);updateProgress(0);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'&&current<PAGES.length-1)goTo(current+1);
+  if(e.key==='ArrowLeft'&&current>0)goTo(current-1);
+});</script></body></html>
