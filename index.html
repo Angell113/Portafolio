@@ -278,7 +278,7 @@
     /* about — one-screen layout */
     #page-about {
       display: flex; align-items: center; justify-content: center;
-      padding: 1.5rem 3rem; overflow: hidden;
+      padding: 1.5rem 3rem;
     }
     #page-about .page-inner { width: 100%; }
     .about-hero { margin-bottom: 1.5rem; }
@@ -290,13 +290,21 @@
     .about-skills-col { display: flex; flex-direction: column; gap: 0.75rem; }
 
     @media (max-width: 700px) {
-      header { padding: 0 1rem; }
-      .page { padding: 2.5rem 1.25rem 4rem; }
-      .about-body { grid-template-columns: 1fr; gap: 1.75rem; }
-      .project-card { grid-template-columns: 2.5rem 1fr; }
+      header { padding: 0 0.75rem; }
+      nav button { font-size: 0.75rem; padding: 0.4rem 0.5rem; }
+      .page { padding: 2rem 1.1rem 4rem; }
+      #page-about { align-items: flex-start; justify-content: flex-start; padding: 2rem 1.1rem 4rem; }
+      .about-hero { margin-bottom: 1.2rem; }
+      .about-hero .hero-subtitle { font-size: 0.82rem; }
+      .about-body { grid-template-columns: 1fr; gap: 1.5rem; }
+      .project-card { grid-template-columns: 2.2rem 1fr; padding: 1.1rem 1.1rem; }
       .project-status { display: none; }
-      .timeline-entry, .edu-entry { grid-template-columns: 1fr; gap: 0.25rem; }
+      .project-desc { font-size: 0.8rem; }
+      .timeline-entry, .edu-entry { grid-template-columns: 1fr; gap: 0.25rem; padding: 1.5rem 0; }
       .tl-date, .edu-date { text-align: left; }
+      .tl-desc, .edu-desc { font-size: 0.8rem; }
+      .section-title { font-size: 1.6rem; margin-bottom: 1.5rem; }
+      .contact-card { padding: 1rem 1.1rem; }
     }
   </style>
 </head>
