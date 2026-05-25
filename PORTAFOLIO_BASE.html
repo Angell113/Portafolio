@@ -2,7 +2,7 @@
 <html lang="es"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portafolio</title>
+  <title>Miguel Angel — Portafolio</title>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; }
@@ -278,7 +278,7 @@
     /* about — one-screen layout */
     #page-about {
       display: flex; align-items: center; justify-content: center;
-      padding: 1.5rem 3rem;
+      padding: 1.5rem 3rem; overflow: hidden;
     }
     #page-about .page-inner { width: 100%; }
     .about-hero { margin-bottom: 1.5rem; }
@@ -290,21 +290,13 @@
     .about-skills-col { display: flex; flex-direction: column; gap: 0.75rem; }
 
     @media (max-width: 700px) {
-      header { padding: 0 0.75rem; }
-      nav button { font-size: 0.75rem; padding: 0.4rem 0.5rem; }
-      .page { padding: 2rem 1.1rem 4rem; }
-      #page-about { align-items: flex-start; justify-content: flex-start; padding: 2rem 1.1rem 4rem; }
-      .about-hero { margin-bottom: 1.2rem; }
-      .about-hero .hero-subtitle { font-size: 0.82rem; }
-      .about-body { grid-template-columns: 1fr; gap: 1.5rem; }
-      .project-card { grid-template-columns: 2.2rem 1fr; padding: 1.1rem 1.1rem; }
+      header { padding: 0 1rem; }
+      .page { padding: 2.5rem 1.25rem 4rem; }
+      .about-body { grid-template-columns: 1fr; gap: 1.75rem; }
+      .project-card { grid-template-columns: 2.5rem 1fr; }
       .project-status { display: inline-flex; grid-column: 2; grid-row: 2; justify-self: start; align-self: start; margin-top: 0.25rem; }
-      .project-desc { font-size: 0.8rem; }
-      .timeline-entry, .edu-entry { grid-template-columns: 1fr; gap: 0.25rem; padding: 1.5rem 0; }
+      .timeline-entry, .edu-entry { grid-template-columns: 1fr; gap: 0.25rem; }
       .tl-date, .edu-date { text-align: left; }
-      .tl-desc, .edu-desc { font-size: 0.8rem; }
-      .section-title { font-size: 1.6rem; margin-bottom: 1.5rem; }
-      .contact-card { padding: 1rem 1.1rem; }
     }
   </style>
 </head>
@@ -338,7 +330,7 @@
         <h1 class="hero-title">
           <span class="name" data-ek="hero-name">Miguel Ángel Núñez&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</span>
         </h1>
-        <p class="hero-subtitle" data-ek="hero-subtitle">Titulado de la carrera Ingeniería en Telecomunicaciones, Conectividad y Redes. Actualmente trabajo en la industria minera como informático, brindando soporte a sistemas LIMS y realizando análisis de datos mineros. Desarrollé soluciones de software para automatizar tareas y generar dashboards automáticos, y aplico macros en Excel para optimizar procesos. Trabajo con integración de PI System (AVEVA) y hago uso destacado de herramientas de inteligencia artificial para asistencia y automatización (MCP, agentes y optimización de uso).</p>
+        <p class="hero-subtitle" data-ek="hero-subtitle">Titulado de la carrera Ingeniero en Telecomunicaciones, Conectividad y Redes, titulado en el instituto INACAP en la localidad de Talcahuano-Concepción. Actualmente trabajo en la industria minera como informático, brindando soporte a sistemas LIMS y realizando análisis de datos mineros. Desarrollé soluciones de software para automatizar tareas y generar dashboards automáticos, y aplico macros en Excel para optimizar procesos. Trabajo con integración de PI System (AVEVA) y hago uso destacado de herramientas de inteligencia artificial para asistencia y automatización (MCP, agentes y optimización de uso).</p>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--border2);margin-bottom:1.5rem;">
@@ -445,10 +437,10 @@
           <div class="project-num">04</div>
           <div class="project-body">
             <div class="project-header">
-              <span class="project-title" data-ek="p4-title">Ingreso de datos Cátodos Químicos</span>
-              <span class="project-org" data-ek="p4-org">SGS MINERAS S.A.</span>
+              <span class="project-title" data-ek="p4-title">Ingreso de datos Catodos Quimicos&nbsp;</span>
+              <span class="project-org" data-ek="p4-org">SGS MINERALS S.A.</span>
             </div>
-            <p class="project-desc" data-ek="p4-desc">Aplicación de escritorio para el registro de datos de los análisis químicos de los Cátodos en el laboratorio DRT, Codelco. Incluye un módulo QA/QC que permite generar cartas de control de manera automática, además de revisar las tendencias de los análisis químicos.</p>
+            <p class="project-desc" data-ek="p4-desc">Workbook Excel macro-habilitado (.xlsm) para registro de analisis quimicos de catodos. Calculo automatico de Pb y S por triplicado, clasificacion por grado de calidad y dashboard con graficos de tendencia por banco. Generado via script Python.</p>
             <div class="project-tags" data-ek="p4-tags"><span class="tag">C# .NET 4.x</span><span class="tag">Windows Forms</span><span class="tag">LiteDB</span><span class="tag">EPPlus</span><span class="tag">ILMerge</span><span class="tag">System.Net.Mail</span><span class="tag">DataVisualization.Charting</span><span class="tag">Batch / CMD</span></div>
           </div>
           <span class="project-status ps-prod" data-ek="p4-status">Produccion</span>
@@ -569,7 +561,7 @@
 
 
 
-<script>
+<div style="position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%); background: rgba(62, 207, 142, 0.15); color: rgb(110, 231, 183); border: 1px solid rgba(62, 207, 142, 0.3); padding: 0.55rem 1.25rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; z-index: 9999; pointer-events: none; transition: opacity 0.4s;">Guardado correctamente</div><script>
 const PAGES=['page-about','page-projects','page-experience','page-education'];
 const NAV_BTNS=document.querySelectorAll('nav button');
 let current=0,animating=false;
